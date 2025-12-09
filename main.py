@@ -95,6 +95,7 @@ app = FastAPI(title="Calendar Management Backend")
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "*"
     # add other origins you need (or use "*" for development)
 ]
 
@@ -413,4 +414,4 @@ def create_event_type(event_type: EventType, session: Session = Depends(get_sess
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
