@@ -3,6 +3,9 @@ from datetime import datetime, date, time, timezone, timedelta
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from sqlmodel import SQLModel, Field, create_engine, Session, select, Relationship
 
@@ -104,6 +107,30 @@ app.add_middleware(
     allow_methods=["*"],          # allow GET, POST, DELETE, OPTIONS, etc.
     allow_headers=["*"],          # allow Content-Type and other headers
 )
+
+# Serve frontend assets and index (works when running with uvicorn)
+frontend_dir = Path(__file__).resolve().parent / "frontend"
+index_file = frontend_dir / "index.html"
+if frontend_dir.exists():
+    assets_dir = frontend_dir / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    def serve_frontend_index():
+        if index_file.exists():
+            return FileResponse(str(index_file))
+        raise HTTPException(status_code=404, detail="Frontend index not found")
+
+    # Serve top-level static files from frontend (e.g., logo.png)
+    logo_file = frontend_dir / "logo.png"
+
+    @app.get("/logo.png", include_in_schema=False)
+    def serve_logo():
+        if logo_file.exists():
+            return FileResponse(str(logo_file))
+        raise HTTPException(status_code=404, detail="logo.png not found")
+
 
 @app.on_event("startup")
 def on_startup():
