@@ -93,8 +93,6 @@ class EventRead(SQLModel):
 
 app = FastAPI(title="Calendar Management Backend")
 origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
     "*"
     # add other origins you need (or use "*" for development)
 ]
